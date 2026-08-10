@@ -57,7 +57,23 @@
                       }
                     }
                   },
-                  "ports": [],
+                  "ports": [
+                    {
+                      "internalPort": 8080,
+                      "protocol": "HTTP",
+                      "name": "p01",
+                      "public": true,
+                      "domains": [],
+                      "security": {
+                        "policies": [],
+                        "credentials": [],
+                        "securePathConfiguration": {
+                          "rules": []
+                        }
+                      },
+                      "disableNfDomain": false
+                    }
+                  ],
                   "billing": {
                     "deploymentPlan": "nf-compute-10",
                     "buildPlan": "nf-compute-400-16"
@@ -76,6 +92,12 @@
                     "pathIgnoreRules": [],
                     "isAllowList": false,
                     "ciIgnoreFlagsEnabled": false
+                  },
+                  "vcsData": {
+                    "projectType": "github",
+                    "accountLogin": "jas-atwal",
+                    "projectUrl": "https://github.com/jas-atwal/northflank",
+                    "projectBranch": "main"
                   }
                 },
                 "ref": "demo",
