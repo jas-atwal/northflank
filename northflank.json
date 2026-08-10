@@ -86,7 +86,7 @@
                   "infrastructure": {
                     "architecture": "x86"
                   },
-                  "name": "demo",
+                  "name": "demo-temp",
                   "disabledCI": false,
                   "buildConfiguration": {
                     "pathIgnoreRules": [],
