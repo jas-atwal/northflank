@@ -98,7 +98,20 @@
                     "accountLogin": "jas-atwal",
                     "projectUrl": "https://github.com/jas-atwal/northflank",
                     "projectBranch": "main"
-                  }
+                  },
+                  "healthChecks": [
+                    {
+                      "type": "readinessProbe",
+                      "protocol": "HTTP",
+                      "path": "/api/health",
+                      "port": 8080,
+                      "initialDelaySeconds": 5,
+                      "periodSeconds": 10,
+                      "timeoutSeconds": 2,
+                      "failureThreshold": 3,
+                      "successThreshold": 1
+                    }
+                  ]
                 },
                 "ref": "demo",
                 "updateMode": "put"
