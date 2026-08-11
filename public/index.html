@@ -1,28 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Northflank Demo</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Northflank Demo App</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; line-height: 1.6; }
+    h1 { color: #111827; }
+    .card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    form { display: flex; flex-direction: column; gap: 12px; }
+    input { padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+    button { padding: 10px 16px; background-color: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    button:hover { background-color: #1d4ed8; }
+    ul { list-style: none; padding: 0; }
+    li { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .status { font-weight: bold; }
+    .healthy { color: #16a34a; }
+    .unhealthy { color: #dc2626; }
+  </style>
 </head>
 <body>
+  <h1>🚀 Northflank Demo App</h1>
+  
   <div class="card">
-    <h1>🚀 Northflank Demo App</h1>
-    <p>Your web application is deployed and running live!</p>
-    <button id="pingBtn">Check API Health</button>
-    <div id="result"></div>
+    <h3>Database & System Status</h3>
+    <p>API Status: <span id="apiStatus">Checking...</span></p>
+    <p>Database Status: <span id="dbStatus">Checking...</span></p>
   </div>
+
+  <div class="card">
+    <h3>Add User</h3>
+    <form id="userForm">
+      <input type="text" id="name" placeholder="Name" required />
+      <input type="email" id="email" placeholder="Email Address" required />
+      <button type="submit">Add User</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Saved Users</h3>
+    <ul id="userList">Loading users...</ul>
+  </div>
+
   <script>
-    document.getElementById('pingBtn').addEventListener('click', async () => {
+    async function checkHealth() {
       try {
         const res = await fetch('/api/health');
         const data = await res.json();
-        document.getElementById('result').innerHTML = `Status: <strong>${data.status}</strong><br>Time: ${data.timestamp}`;
+        document.getElementById('apiStatus').innerText = data.status;
+        document.getElementById('apiStatus').className = 'status healthy';
+        document.getElementById('dbStatus').innerText = data.database || 'disconnected';
+        document.getElementById('dbStatus').className = data.database === 'connected' ? 'status healthy' : 'status unhealthy';
       } catch (err) {
-        document.getElementById('result').innerText = 'Failed to reach API server.';
+        document.getElementById('apiStatus').innerText = 'Offline';
+        document.getElementById('apiStatus').className = 'status unhealthy';
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const res = await fetch('/api/users');
+        const users = await res.json();
+        const list = document.getElementById('userList');
+        if (users.length === 0) {
+          list.innerHTML = '<li>No users found. Add one above!</li>';
+          return;
+        }
+        list.innerHTML = users.map(u => `<li><strong>${u.name}</strong> <span>${u.email}</span></li>`).join('');
+      } catch (err) {
+        document.getElementById('userList').innerHTML = '<li>Failed to load users</li>';
+      }
+    }
+
+    document.getElementById('userForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email })
+      });
+
+      if (res.ok) {
+        document.getElementById('name').value = '';
+        document.getElementById('email').value = '';
+        loadUsers();
+      } else {
+        alert('Failed to add user');
       }
     });
+
+    checkHealth();
+    loadUsers();
   </script>
 </body>
 </html>
