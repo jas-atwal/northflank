@@ -13,10 +13,12 @@
     button { padding: 10px 16px; background-color: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
     button:hover { background-color: #1d4ed8; }
     ul { list-style: none; padding: 0; }
-    li { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    li { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     .status { font-weight: bold; }
     .healthy { color: #16a34a; }
     .unhealthy { color: #dc2626; }
+    .btn-delete { background-color: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
+    .btn-delete:hover { background-color: #dc2626; }
   </style>
 </head>
 <body>
@@ -66,9 +68,26 @@
           list.innerHTML = '<li>No users found. Add one above!</li>';
           return;
         }
-        list.innerHTML = users.map(u => `<li><strong>${u.name}</strong> <span>${u.email}</span></li>`).join('');
+        list.innerHTML = users.map(u => `
+          <li>
+            <span><strong>${u.name}</strong> (${u.email})</span>
+            <button class="btn-delete" onclick="deleteUser('${u._id}')">Delete</button>
+          </li>
+        `).join('');
       } catch (err) {
         document.getElementById('userList').innerHTML = '<li>Failed to load users</li>';
+      }
+    }
+
+    async function deleteUser(id) {
+      if (!confirm('Are you sure you want to delete this user?')) return;
+      
+      const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+      
+      if (res.ok) {
+        loadUsers();
+      } else {
+        alert('Failed to delete user');
       }
     }
 
